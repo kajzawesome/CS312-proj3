@@ -1,15 +1,26 @@
-class  unsortedArray:
-    def __init__(self, location, node, cost):
-                                                                  
+class  unsorted:
+    unsortedArray = dict[int,float]
 
-    def getCost(self):
-        return self.cost
+    def __init__(self):
+        self.unsortedArray = {
+            None: None
+        }
 
-    def push(self):
-        yep: str = "yipee"
+    def __init__(self,node, cost):
+        self.unsortedArray = {
+            node: cost
+        }
+
+    def push(self, node, cost):
+        self.unsortedArray[node] = cost
 
     def pop(self):
-        del(self)
+        u = next(reversed(self.unsortedArray.items()))
+        del(next(reversed(self.unsortedArray.items())))
+        return u
+
+    def pop(self,node):
+        del(self.unsortedArray[node])
 
 
 
@@ -41,6 +52,32 @@ class binaryHeap:
 
 
 
+def find_shortest_path_with_array(
+        graph: dict[int, dict[int, float]],
+        source: int,
+        target: int
+) -> tuple[list[int], float]:
+    """
+    Find the shortest (least-cost) path from `source` to `target` in `graph`
+    using the array-based (linear lookup) algorithm.
+
+    Return:
+        - the list of nodes (including `source` and `target`)
+        - the cost of the path
+    """
+    dist = dict(int, int)
+    for u in graph:
+        dist[u] =  float('inf')
+    dist[source] = 0
+    Q = unsorted(source,0)
+    while Q is not None:
+        u = Q.pop()
+        for v in graph[Q]:
+            if dist[v] == float('inf'):
+                dist[v] = dist[u] + graph[u][v]
+                Q.push(v,dist[v])
+
+
 def find_shortest_path_with_heap(
         graph: dict[int, dict[int, float]],
         source: int,
@@ -58,37 +95,10 @@ def find_shortest_path_with_heap(
     for u in graph:
         dist[u] =  float('inf')
     dist[source] = 0
-    Q: unsortedArray = source
+    Q: binaryHeap = __init__(source,0)
     while Q is not None:
-        u = pop(Q)
-        for each edge (u,v) in E:
+        u = Q.pop()
+        for v in graph[Q]:
             if dist[v] == float('inf'):
-                dist[v] = dist[u] + 1
-                push(Q,v)
-
-
-
-def find_shortest_path_with_array(
-        graph: dict[int, dict[int, float]],
-        source: int,
-        target: int
-) -> tuple[list[int], float]:
-    """
-    Find the shortest (least-cost) path from `source` to `target` in `graph`
-    using the array-based (linear lookup) algorithm.
-
-    Return:
-        - the list of nodes (including `source` and `target`)
-        - the cost of the path
-    """
-    dist = map(int, int)
-    for u in graph:
-        dist[u] =  float('inf')
-    dist[source] = 0
-    Q: binaryHeap = source
-    while Q is not None:
-        u = pop(Q)
-        for each edge (u,v) in E:
-            if dist[v] == float('inf'):
-                dist[v] = dist[u] + 1
+                dist[v] = dist[u] + graph[u][v]
                 push(Q,v)
