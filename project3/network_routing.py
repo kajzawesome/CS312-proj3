@@ -70,12 +70,20 @@ def find_shortest_path_with_array(
         dist[u] =  float('inf')
     dist[source] = 0
     Q = unsorted(source,0)
+    nodesVisited: list
+    nodesVisited.add(source)
     while Q is not None:
         u = Q.pop()
         for v in graph[Q]:
             if dist[v] == float('inf'):
                 dist[v] = dist[u] + graph[u][v]
                 Q.push(v,dist[v])
+        if u == target:
+            break
+        else:
+            nodesVisited.add(u)
+    return nodesVisited, dist[u]
+
 
 
 def find_shortest_path_with_heap(
