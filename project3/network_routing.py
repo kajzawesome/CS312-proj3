@@ -24,31 +24,53 @@ class  unsorted:
 
 
 
-class binaryHeap:
-    def __init__(self, node, child1, child2, cost1, cost2):
-        self.node = node
-        self.cost1 = cost1
-        self.cost2 = cost2
-        self.child1 = child1
-        self.child2 = child2
 
-    def isLast(self) -> bool:
-        if self.child1() is None and self.child2() is None:
-            return True
-        else:    
-            return False
+class BinaryMinHeap:
+    nodes: list[int]
 
-    def isParentBigger(self):
-        if self.isLast() is not True:
-            if self.child1 < self.node:
-                temp = self.child1
-                self.child1 = self.node
-                self.node = temp
-            else: 
-                if self.child2 < self.node:
-                    temp = self.child2
-                    self.child2 = self.node
-                    self.node = temp 
+    def __init__(self, nodes: list[int] =  []):
+        self.nodes = []
+        for node in nodes:
+            self.add(node)
+
+#helper functions
+    def get_left_child_index(self, parent_index: int):
+        return 2 * parent_index + 1
+    def get_right_child_index(self, parent_index: int):
+        return 2 * parent_index + 2
+    def get_parent_index(self, child_index: int):
+        return (child_index -1) // 2
+
+    def has_left_child(self, parent_index: int) -> bool:
+        return self.get_left_child_index(parent_index) < len(self.nodes)
+    def has_right_child(self, parent_index: int) -> bool:
+        return self.get_right_child_index(parent_index) < len(self.nodes)
+    def has_parent(self, index: int) -> bool:
+        return self.get_parent_index(index) >= 0
+
+    def parent(self, index: int):
+        return self.nodes[self.get_parent_index(index)]
+    def left_child(self, index: int):
+        return self.nodes[self.get_left_child_index(index)]
+    def right_child(self, index: int):
+        return self.nodes[self.get_right_child_index(index)]
+
+#functions to construct and edit tree to keep min on top/first element
+    def add(self, item:int):
+        self.nodes.append(item)
+        self.update_key()
+
+    def swap(self, first_idx: int, second_idx: int):
+        temp = self.nodes[first_idx]
+        self.nodes[first_idx] = self.nodes[second_idx]
+        self.nodes[second_idx] = temp
+
+    def update_key(self):
+        position: int = len(self.nodes) - 1
+        while (self.has_parent(position) and self.parent(position) > self.nodes[position]):
+            self.swap(self.get_parent_index(position),position)
+            position = self.get_parent_index(position)
+
 
 
 
