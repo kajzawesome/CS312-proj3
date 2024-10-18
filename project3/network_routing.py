@@ -33,6 +33,10 @@ class BinaryMinHeap:
         for node in nodes:
             self.add(node)
 
+    def __init__(self, node: int):
+        self.nodes = []
+        self.add(node)
+
 #helper functions
     def get_left_child_index(self, parent_index: int):
         return 2 * parent_index + 1
@@ -58,18 +62,34 @@ class BinaryMinHeap:
 #functions to construct and edit tree to keep min on top/first element
     def add(self, item:int):
         self.nodes.append(item)
-        self.update_key()
+        position: int = len(self.nodes) - 1
+        self.heapify_up(position)
 
     def swap(self, first_idx: int, second_idx: int):
         temp = self.nodes[first_idx]
         self.nodes[first_idx] = self.nodes[second_idx]
         self.nodes[second_idx] = temp
 
-    def update_key(self):
-        position: int = len(self.nodes) - 1
-        while (self.has_parent(position) and self.parent(position) > self.nodes[position]):
+    def heapify_up(self, position):
+        if (self.has_parent(position) and self.parent(position) > self.nodes[position]):
             self.swap(self.get_parent_index(position),position)
-            position = self.get_parent_index(position)
+            self.heapify_up(self.get_parent_index(position))
+
+    def remove(self, position):
+        node = self.node[0]
+        self.nodes[0] = self.nodes[(len(self.nodes) - 1)]
+        self.heapify_down(0)
+        return node
+
+    def heapify_down(self, index: int):
+        smallest = index
+        if (self.has_right_child(index) and self.nodes[smallest]) > self.right_child(index):
+            smallest = self.get_right_child_index(index)
+        if (self.has_left_child(index) and self.nodes[smallest]) > self.left_child(index):
+            smallest = self.get_left_child_index(index)
+        if smallest is not index:
+            self.swap(index, smallest)
+            self.heapify_down(smallest)
 
 
 
@@ -96,7 +116,7 @@ def find_shortest_path_with_array(
     nodesVisited.add(source)
     while Q is not None:
         u = Q.pop()
-        for v in graph[Q]:
+        for v in graph[u]:
             if dist[v] == float('inf'):
                 dist[v] = dist[u] + graph[u][v]
                 Q.push(v,dist[v])
@@ -122,13 +142,16 @@ def find_shortest_path_with_heap(
         - the cost of the path
     """
     dist = map(int, int)
+    prev = dict(int, int)
     for u in graph:
         dist[u] =  float('inf')
+        prev[u] = None
     dist[source] = 0
-    Q: binaryHeap = __init__(source,0)
-    while Q is not None:
-        u = Q.pop()
-        for v in graph[Q]:
-            if dist[v] == float('inf'):
+    H = BinaryMinHeap(source) #
+    while H is not None:
+        u = H.remove(0)
+        for v in graph[u]:
+            if dist[u] + graph[u][v] < dist[v]:
                 dist[v] = dist[u] + graph[u][v]
-                push(Q,v)
+                H.heapify_down(0)
+                prev[v] = u
