@@ -16,11 +16,16 @@ class  unsorted:
 
     def pop(self):
         u = next(reversed(self.unsortedArray.items()))
-        del(next(reversed(self.unsortedArray.items())))
+        del(self.unsortedArray[u[0]])
         return u
 
-    def pop(self,node):
-        del(self.unsortedArray[node])
+    def pop(self):
+        lowest = float("inf")
+        for node in self.unsortedArray:
+            if lowest > self.unsortedArray[node]:
+                lowest = node
+        del(self.unsortedArray[lowest])
+        return lowest
 
 
 
@@ -75,8 +80,8 @@ class BinaryMinHeap:
             self.swap(self.get_parent_index(position),position)
             self.heapify_up(self.get_parent_index(position))
 
-    def remove(self, position):
-        node = self.node[0]
+    def remove(self):
+        node = self.nodes[0]
         self.nodes[0] = self.nodes[(len(self.nodes) - 1)]
         self.heapify_down(0)
         return node
@@ -107,24 +112,38 @@ def find_shortest_path_with_array(
         - the list of nodes (including `source` and `target`)
         - the cost of the path
     """
-    dist = dict(int, int)
-    for u in graph:
-        dist[u] =  float('inf')
+    dist = {}
+    path = {}
+    for item in graph:
+        dist[item] =  float('inf')
+        path[item] = None
     dist[source] = 0
+    path[source] = source
     Q = unsorted(source,0)
-    nodesVisited: list
-    nodesVisited.add(source)
+    nodesVisited = []
+
     while Q is not None:
         u = Q.pop()
-        for v in graph[u]:
-            if dist[v] == float('inf'):
-                dist[v] = dist[u] + graph[u][v]
-                Q.push(v,dist[v])
-        if u == target:
-            break
-        else:
-            nodesVisited.add(u)
-    return nodesVisited, dist[u]
+        if graph[u] is not None:
+            for v in graph[u]:
+                if dist[v] == float('inf'):
+                    dist[v] = dist[u] + graph[u][v]
+                    path[v] = u
+                    Q.push(v,dist[v])
+                elif dist[v] < dist[u] + graph[u][v]:
+                    dist[v] = dist[u] + graph[u][v]
+                    path[v] = u
+            
+            if u == target:
+                break
+    item = path[target]
+    while item is not source:
+        nodesVisited.append(item)
+        item = path[item]
+    bestPath = []
+    for item in nodesVisited[:-1]:
+        bestPath.append(item)
+    return bestPath, dist[target]
 
 
 
@@ -141,17 +160,26 @@ def find_shortest_path_with_heap(
         - the list of nodes (including `source` and `target`)
         - the cost of the path
     """
-    dist = map(int, int)
-    prev = dict(int, int)
+    dist = {}
+    prev = {}
     for u in graph:
         dist[u] =  float('inf')
         prev[u] = None
     dist[source] = 0
-    H = BinaryMinHeap(source) #
+    H = BinaryMinHeap(source)
+    nodesVisited = []
+    nodesVisited.append(source)
     while H is not None:
-        u = H.remove(0)
-        for v in graph[u]:
-            if dist[u] + graph[u][v] < dist[v]:
-                dist[v] = dist[u] + graph[u][v]
-                H.heapify_down(0)
-                prev[v] = u
+        u = H.remove()
+        if graph[u] is not None:
+            for v in graph[u]:
+                if dist[u] + graph[u][v] < dist[v]:
+                    dist[v] = dist[u] + graph[u][v]
+                    H.heapify_down(0)
+                    prev[v] = u
+            if u == target:
+                break
+            else:
+                nodesVisited.append(u)
+
+    return nodesVisited, dist[target]

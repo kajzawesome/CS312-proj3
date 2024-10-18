@@ -2,6 +2,8 @@ from byu_pytest_utils import max_score, with_import
 
 from main import generate_graph
 
+from network_routing import find_shortest_path_with_array
+
 
 def tiny_test(finder):
     graph = {
@@ -66,3 +68,6 @@ def test_large_network_heap(find_shortest_path_with_heap):
 @with_import('network_routing')
 def test_large_network_array(find_shortest_path_with_array):
     large_test(find_shortest_path_with_array)
+
+
+tiny_test(find_shortest_path_with_array)
